@@ -642,6 +642,9 @@
         <div class="form-actions">
           <button class="btn btn-primary btn-sm" id="btnGuardarRutina">Guardar rutina</button>
           <button class="btn btn-ghost btn-sm" id="btnEnviarCorreo">Enviar rutina por correo</button>
+          <select id="selMedioCorreo" title="Con qué se abre el correo en este computador" style="width:auto; padding:6px 8px; font:600 12px 'Public Sans',sans-serif">
+            <option value="outlook">Correo con Outlook web</option><option value="gmail">Correo con Gmail</option><option value="programa">Correo con programa del equipo</option>
+          </select>
           <button class="btn btn-ghost btn-sm" id="btnCompartirPortal">Enviar rutina por WhatsApp</button>
         </div>
         <div id="rutinasAnteriores"></div>
@@ -1838,6 +1841,8 @@ function telWhatsApp(tel){
   return /^569\d{8}$/.test(d) ? d : null;
 }
 function fmtTel(d){ return "+" + d.slice(0, 2) + " " + d.slice(2, 3) + " " + d.slice(3, 7) + " " + d.slice(7); }
+// Con qué se abre el correo en este computador: "outlook" (web, Microsoft 365), "gmail" o "programa" (mailto)
+function medioCorreo(){ try{ return localStorage.getItem("gym-medio-correo") || "outlook"; }catch(e){ return "outlook"; } }
 function correoValido(c){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(c || "").trim()); }
 function enviarCorreo(){
   const url = enlacePortal();
@@ -1864,7 +1869,11 @@ function enviarCorreo(){
     "",
     "Gimnasio UNAB"
   ].join("\n");
-  location.href = "mailto:" + encodeURIComponent(s.correo.trim()) + "?subject=" + encodeURIComponent(asunto) + "&body=" + encodeURIComponent(cuerpo);
+  const para = encodeURIComponent(s.correo.trim()), su = encodeURIComponent(asunto), bo = encodeURIComponent(cuerpo);
+  const via = medioCorreo();
+  if(via === "outlook") window.open("https://outlook.office.com/mail/deeplink/compose?to=" + para + "&subject=" + su + "&body=" + bo, "_blank", "noopener");
+  else if(via === "gmail") window.open("https://mail.google.com/mail/?view=cm&fs=1&to=" + para + "&su=" + su + "&body=" + bo, "_blank", "noopener");
+  else location.href = "mailto:" + para + "?subject=" + su + "&body=" + bo;
   document.getElementById("btnEnviarCorreo").classList.replace("btn-primary", "btn-ghost");
 }
 function actualizarBotonWhatsApp(){
@@ -3205,6 +3214,9 @@ async function init(){
   document.getElementById("btnGuardarRutina").addEventListener("click", guardarRutina);
   document.getElementById("btnCompartirPortal").addEventListener("click", compartirPortal);
   document.getElementById("btnEnviarCorreo").addEventListener("click", enviarCorreo);
+  const selMC = document.getElementById("selMedioCorreo");
+  selMC.value = medioCorreo();
+  selMC.addEventListener("change", () => { try{ localStorage.setItem("gym-medio-correo", selMC.value); }catch(e){} });
   document.getElementById("btnAgregarEvaluacion").addEventListener("click", agregarEvaluacion);
   document.getElementById("btnCancelarEval").addEventListener("click", cancelarEdicionEval);
   document.getElementById("btnAgregarFuerza").addEventListener("click", agregarFilaFuerza);
