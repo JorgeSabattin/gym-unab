@@ -324,7 +324,7 @@
   .sv-ev td.n .dl{color:var(--muted); font-weight:400; font-size:12px; margin-left:4px}
   .sv-ev .fuente{font-size:12.5px; color:var(--muted); margin:-4px 0 10px}
 
-  /* ---------- Vista del socio (celular) ---------- */
+  /* ---------- Vista del alumno (celular) ---------- */
   body.modo-socio .wrap{max-width:560px; padding:0 0 calc(40px + env(safe-area-inset-bottom))}
   body.modo-socio header.app{display:none}
   .sv-login{padding:calc(48px + env(safe-area-inset-top)) 22px 30px}
@@ -436,11 +436,11 @@
     <div>
       <div class="eyebrow">Universidad Andrés Bello</div>
       <h1 id="tituloApp">Control de acceso · Gimnasio</h1>
-      <div class="sub" id="subTitulo">Registro de socios, entrada y salida</div>
+      <div class="sub" id="subTitulo">Registro de alumnos, entrada y salida</div>
     </div>
     <div class="acciones" id="accionesHeader">
       <span class="modo" id="modoBadge"></span>
-      <a class="btn btn-ghost btn-sm" id="lnkPortal" href="#socio" target="_blank" rel="noopener">Vista del socio (celular)</a>
+      <a class="btn btn-ghost btn-sm" id="lnkPortal" href="#socio" target="_blank" rel="noopener">Vista del alumno (celular)</a>
       <button class="btn btn-ghost btn-sm" id="btnLogout" style="display:none">Cerrar sesión</button>
     </div>
   </header>
@@ -526,7 +526,7 @@
           Registro de visitas <span class="count" id="tabCountVisitas">0</span>
         </button>
         <button class="tab-btn" id="tabBtnSocios" data-tab="socios">
-          Inscribir socios <span class="count" id="tabCountSocios">0</span>
+          Inscribir alumnos <span class="count" id="tabCountSocios">0</span>
         </button>
         <button class="tab-btn" id="tabBtnAccesos" data-tab="accesos">
           Accesos <span class="count" id="tabCountAccesos">0</span>
@@ -543,20 +543,20 @@
     <!-- Registro de socios -->
     <div class="section card" style="margin-top:0">
       <div class="section-head">
-        <h2>Registro de socios</h2>
+        <h2>Registro de alumnos</h2>
         <div class="filters" style="align-items:center">
           <span id="countSocios" style="color:var(--muted); font-size:12.5px"></span>
-          <button class="btn btn-primary btn-sm" id="btnNuevoSocio">+ Nuevo socio</button>
-          <button class="btn btn-ghost btn-sm" id="btnImportar">Importar socios (JSON)</button>
+          <button class="btn btn-primary btn-sm" id="btnNuevoSocio">+ Nuevo alumno</button>
+          <button class="btn btn-ghost btn-sm" id="btnImportar">Importar alumnos (JSON)</button>
           <button class="btn btn-ghost btn-sm" id="btnRespaldo">Descargar respaldo</button>
           <input type="file" id="fileImportar" accept=".json,application/json" style="display:none">
         </div>
       </div>
-      <div class="desc" style="margin-top:-6px">Ficha con los datos de contacto de cada socio del gimnasio.</div>
+      <div class="desc" style="margin-top:-6px">Ficha con los datos de contacto de cada alumno del gimnasio.</div>
 
       <div class="edit-note" id="editNote">
-        <span id="editNoteTxt">Editando socio existente.</span>
-        <span class="link-inline" id="cancelarEdicion">Cerrar ficha y crear nuevo socio</span>
+        <span id="editNoteTxt">Editando alumno existente.</span>
+        <span class="link-inline" id="cancelarEdicion">Cerrar ficha y crear nuevo alumno</span>
       </div>
 
       <div class="form-grid">
@@ -575,6 +575,10 @@
         <div class="field">
           <label for="socTelefonoContacto">Teléfono de contacto</label>
           <input type="tel" id="socTelefonoContacto" placeholder="+56 9 8765 4321" autocomplete="off">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="socCorreo">Correo</label>
+          <input type="email" id="socCorreo" placeholder="nombre@correo.cl" autocomplete="off">
         </div>
         <div class="field" style="grid-column:1/-1">
           <label for="socDireccion">Dirección</label>
@@ -611,20 +615,20 @@
         <label style="margin-top:10px">PAR-Q</label>
         <div class="parq" id="parqGrid"></div>
         <label class="chk-rpe"><input type="checkbox" id="socControlRPE">
-          <span>Controlar intensidad por RPE (usa un fármaco que altera la frecuencia cardíaca). El socio verá solo el aviso, no el motivo.</span></label>
+          <span>Controlar intensidad por RPE (usa un fármaco que altera la frecuencia cardíaca). El alumno verá solo el aviso, no el motivo.</span></label>
       </details>
 
       <div class="form-actions">
-        <button class="btn btn-primary" id="btnGuardarSocio">Inscribir socio</button>
+        <button class="btn btn-primary" id="btnGuardarSocio">Inscribir alumno</button>
       </div>
 
-      <div class="ficha-hint" id="fichaHint">Guarda al socio para poder asignarle una rutina y registrar evaluaciones.</div>
+      <div class="ficha-hint" id="fichaHint">Guarda al alumno para poder asignarle una rutina y registrar evaluaciones.</div>
 
       <!-- Rutina y evaluaciones (solo con socio ya guardado) -->
       <div class="ficha-avanzada" id="fichaAvanzada">
 
         <h3>Rutina de entrenamiento</h3>
-        <div class="desc">Es lo que el socio ve en su celular. Elige los ejercicios y, cuando corresponda, el peso en kg.</div>
+        <div class="desc">Es lo que el alumno ve en su celular. Elige los ejercicios y, cuando corresponda, el peso en kg.</div>
         <div id="rutinaMeta"></div>
         <div class="form-grid" style="margin-bottom:14px; display:none">
           <div class="field"><label for="rutBaseEval">Basada en la evaluación del</label><select id="rutBaseEval"></select></div>
@@ -637,12 +641,13 @@
         <div id="rutinaEditor"></div>
         <div class="form-actions">
           <button class="btn btn-primary btn-sm" id="btnGuardarRutina">Guardar rutina</button>
-          <button class="btn btn-ghost btn-sm" id="btnCompartirPortal">Enviar enlace al socio (WhatsApp)</button>
+          <button class="btn btn-ghost btn-sm" id="btnEnviarCorreo">Enviar rutina por correo</button>
+          <button class="btn btn-ghost btn-sm" id="btnCompartirPortal">Enviar rutina por WhatsApp</button>
         </div>
         <div id="rutinasAnteriores"></div>
 
         <h3 style="margin-top:26px">Evaluaciones</h3>
-        <div class="desc">Registro periódico de control del socio. El socio ve sus evaluaciones (con el informe) en su celular.</div>
+        <div class="desc">Registro periódico de control del alumno. El alumno ve sus evaluaciones (con el informe) en su celular.</div>
         <div class="eval-editando" id="evalEditando"></div>
         <div class="form-grid">
           <div class="field">
@@ -662,7 +667,7 @@
             <input type="text" id="evalNotas" placeholder="Observaciones de la evaluación">
           </div>
           <details class="antecedentes ev-extra" id="evalExtra" style="grid-column:1/-1">
-            <summary>Composición corporal y signos vitales <span class="solo-staff">opcional · el socio también lo ve</span></summary>
+            <summary>Composición corporal y signos vitales <span class="solo-staff">opcional · el alumno también lo ve</span></summary>
             <div id="evalExtraGrid"></div>
           </details>
           <div class="field" style="grid-column:1/-1">
@@ -683,9 +688,13 @@
         <div id="tablaEvaluacionesWrap"></div>
         <input type="file" id="evalAdjuntar" accept="image/*" style="display:none">
 
-        <h3 style="margin-top:26px">Sesiones registradas por el socio</h3>
-        <div class="desc">Lo que el socio marcó como realizado desde el portal.</div>
+        <h3 style="margin-top:26px">Sesiones registradas por el alumno</h3>
+        <div class="desc">Lo que el alumno marcó como realizado desde el portal.</div>
         <div id="tablaRegistrosWrap"></div>
+
+        <h3 style="margin-top:26px">Progreso de cargas</h3>
+        <div class="desc">Peso que el alumno registró en cada ejercicio, de la sesión más antigua a la más reciente.</div>
+        <div id="tablaProgresoWrap"></div>
       </div>
 
       <div class="section" style="margin-top:20px">
@@ -703,7 +712,7 @@
     <div class="view" id="viewAccesos">
       <div class="card">
         <div class="section-head"><h2>Puertas</h2></div>
-        <div class="desc" style="margin-top:-6px">Cada puerta es un tablet (o un lector) que valida el QR del socio. Para configurar un tablet, abre en él la dirección de la puerta e ingresa su ID y clave.</div>
+        <div class="desc" style="margin-top:-6px">Cada puerta es un tablet (o un lector) que valida el QR del alumno. Para configurar un tablet, abre en él la dirección de la puerta e ingresa su ID y clave.</div>
         <div class="row" style="max-width:520px; margin-bottom:14px">
           <input type="text" id="nuevaPuertaNombre" placeholder="Nombre, ej: Puerta principal" autocomplete="off">
           <button class="btn btn-primary btn-sm" id="btnAgregarPuerta" style="flex:0 0 auto">+ Agregar puerta</button>
@@ -727,7 +736,7 @@
     <div class="view" id="viewEjercicios">
       <div class="card">
         <h2>Catálogo de ejercicios</h2>
-        <div class="desc">Base de datos de ejercicios del gimnasio. Aparecen en el menú desplegable al armar la rutina de cada socio.
+        <div class="desc">Base de datos de ejercicios del gimnasio. Aparecen en el menú desplegable al armar la rutina de cada alumno.
           Los valores por defecto se completan solos al elegir el ejercicio en una rutina.</div>
         <div class="form-grid">
           <div class="field"><label for="ejNombre">Nombre</label><input type="text" id="ejNombre" placeholder="Ej: Sentadilla goblet" autocomplete="off"></div>
@@ -765,10 +774,10 @@
       <!-- Registrar entrada -->
       <div class="card">
         <h2>Registrar entrada</h2>
-        <div class="desc">Ingresa el RUT del socio para asignarle un casillero.</div>
+        <div class="desc">Ingresa el RUT del alumno para asignarle un casillero.</div>
 
         <div class="field">
-          <label for="inpRut">RUT del socio</label>
+          <label for="inpRut">RUT del alumno</label>
           <input type="text" id="inpRut" placeholder="12.345.678-9" autocomplete="off">
           <div class="lookup" id="lookupMsg"></div>
         </div>
@@ -802,7 +811,7 @@
     <!-- Socios dentro -->
     <div class="section card">
       <div class="section-head">
-        <h2>Socios en el gimnasio ahora</h2>
+        <h2>Alumnos en el gimnasio ahora</h2>
         <span id="countDentro" style="color:var(--muted); font-size:12.5px"></span>
       </div>
       <div id="tablaDentroWrap"></div>
@@ -1210,7 +1219,7 @@ async function guardar(key, value, msgError){
 async function guardarConfig(){ return guardar("gym-config", CONFIG, "No se pudo guardar la configuración."); }
 async function guardarCasilleros(){ return guardar("gym-casilleros-estado", CASILLEROS, "No se pudo guardar el estado de casilleros."); }
 async function guardarVisitas(){ return guardar("gym-visitas", VISITAS, "No se pudo guardar el historial."); }
-async function guardarSocios(){ return guardar("gym-socios", SOCIOS, "No se pudo guardar el registro de socios."); }
+async function guardarSocios(){ return guardar("gym-socios", SOCIOS, "No se pudo guardar el registro de alumnos."); }
 
 // Rotación de sesiones: la siguiente a la última registrada
 function proximaSesion(rutina, registros){
@@ -1343,37 +1352,39 @@ async function guardarFichaSocio(){
   const nombre = document.getElementById("socNombre").value.trim();
   const telefono = document.getElementById("socTelefono").value.trim();
   const telefonoContacto = document.getElementById("socTelefonoContacto").value.trim();
+  const correo = document.getElementById("socCorreo").value.trim();
   const direccion = document.getElementById("socDireccion").value.trim();
   const objetivo = document.getElementById("socObjetivo").value;
   const pin = document.getElementById("socPin").value.trim();
 
   if(!rutValido(norm)){ toast("RUT no válido.", true); return; }
-  if(!nombre){ toast("Falta el nombre del socio.", true); return; }
+  if(correo && !correoValido(correo)){ toast("El correo no es válido.", true); return; }
+  if(!nombre){ toast("Falta el nombre del alumno.", true); return; }
   if(pin && !/^\d{4,6}$/.test(pin)){ toast("La clave debe tener entre 4 y 6 dígitos.", true); return; }
   const habilitado = document.getElementById("socHabilitado").value !== "no";
   const vigenteHasta = document.getElementById("socVigente").value.trim();
   if(vigenteHasta && !fechaNum(vigenteHasta)){ toast("«Plan vigente hasta» debe tener formato dd-mm-aaaa.", true); return; }
 
   if(editandoRut && norm !== editandoRut){
-    toast("No se puede cambiar el RUT de un socio existente. Para inscribir a otra persona pulsa «+ Nuevo socio».", true);
+    toast("No se puede cambiar el RUT de un alumno existente. Para inscribir a otra persona pulsa «+ Nuevo alumno».", true);
     document.getElementById("socRut").value = formatRut(editandoRut);
     return;
   }
   if(!editandoRut && SOCIOS[norm]){
-    if(confirm("Ya existe un socio con el RUT " + formatRut(norm) + " (" + SOCIOS[norm].nombre + "). ¿Abrir su ficha?")) cargarSocioEnFormulario(norm);
+    if(confirm("Ya existe un alumno con el RUT " + formatRut(norm) + " (" + SOCIOS[norm].nombre + "). ¿Abrir su ficha?")) cargarSocioEnFormulario(norm);
     return;
   }
   const esNuevo = !SOCIOS[norm];
   const existente = SOCIOS[norm] || {};
   SOCIOS[norm] = Object.assign({}, existente, {
-    nombre, telefono, telefonoContacto, direccion, objetivo, pin, habilitado, vigenteHasta,
+    nombre, telefono, telefonoContacto, correo, direccion, objetivo, pin, habilitado, vigenteHasta,
     antecedentes: MOSTRAR_ANAMNESIS ? leerAntecedentes() : (existente.antecedentes || {}),
     controlRPE: MOSTRAR_ANAMNESIS ? document.getElementById("socControlRPE").checked : !!existente.controlRPE,
     rutina: existente.rutina || null,
     evaluaciones: existente.evaluaciones || []
   });
   await guardarSocios();
-  toast(esNuevo ? "Socio registrado." : "Ficha actualizada.");
+  toast(esNuevo ? "Alumno registrado." : "Ficha actualizada.");
   cargarSocioEnFormulario(norm);
   render();
 }
@@ -1386,6 +1397,7 @@ function cargarSocioEnFormulario(rutNorm){
   document.getElementById("socNombre").value = s.nombre || "";
   document.getElementById("socTelefono").value = s.telefono || "";
   document.getElementById("socTelefonoContacto").value = s.telefonoContacto || "";
+  document.getElementById("socCorreo").value = s.correo || "";
   document.getElementById("socDireccion").value = s.direccion || "";
   document.getElementById("socObjetivo").value = s.objetivo || "";
   document.getElementById("socPin").value = s.pin || "";
@@ -1415,7 +1427,7 @@ function cargarSocioEnFormulario(rutNorm){
 function limpiarFormularioSocio(){
   editandoRut = null;
   rutinaEnEdicion = [];
-  ["socRut","socNombre","socTelefono","socTelefonoContacto","socDireccion","socPin"].forEach(id=>{
+  ["socRut","socNombre","socTelefono","socTelefonoContacto","socCorreo","socDireccion","socPin"].forEach(id=>{
     document.getElementById(id).value = "";
   });
   document.getElementById("socObjetivo").value = "";
@@ -1426,7 +1438,7 @@ function limpiarFormularioSocio(){
   renderResumenAntecedentes(null);
   document.getElementById("bloqueAntecedentes").open = false;
   document.getElementById("editNote").classList.remove("show");
-  document.getElementById("btnGuardarSocio").textContent = "Inscribir socio";
+  document.getElementById("btnGuardarSocio").textContent = "Inscribir alumno";
   cancelarEdicionEval();
   document.getElementById("fichaAvanzada").classList.remove("show");
   document.getElementById("fichaHint").style.display = "block";
@@ -1438,7 +1450,7 @@ async function eliminarSocio(rutNorm){
   if(!confirm("¿Eliminar la ficha de " + s.nombre + "? Esto no borra su historial de visitas.")) return;
   delete SOCIOS[rutNorm];
   await guardarSocios();
-  toast("Socio eliminado del registro.");
+  toast("Alumno eliminado del registro.");
   if(editandoRut === rutNorm) limpiarFormularioSocio();
   render();
 }
@@ -1787,12 +1799,13 @@ function rutinaDesactualizada(s){
   return fechaNum(ult.fecha) > base;
 }
 function renderRutinaMeta(){
+  actualizarBotonWhatsApp();
   const banner = document.getElementById("rutinaMeta");
   if(!editandoRut || !SOCIOS[editandoRut]){ banner.innerHTML = ""; return; }
   const r = SOCIOS[editandoRut].rutina || {};
   banner.innerHTML = (r.sesiones || []).length
-    ? '<div class="rut-banner ok">Publicada en el celular del socio' + (r.vigenteDesde ? ' desde el ' + escapeHtml(r.vigenteDesde) : '') + '.</div>'
-    : '<div class="rut-banner">El socio aún no tiene rutina publicada.</div>';
+    ? '<div class="rut-banner ok">Publicada en el celular del alumno' + (r.vigenteDesde ? ' desde el ' + escapeHtml(r.vigenteDesde) : '') + '.</div>'
+    : '<div class="rut-banner">El alumno aún no tiene rutina publicada.</div>';
 }
 function renderRutinasAnteriores(){
   const host = document.getElementById("rutinasAnteriores");
@@ -1816,13 +1829,67 @@ function enlacePortal(){
   if(APP_SOCIO_URL) return APP_SOCIO_URL;
   return location.protocol.startsWith("http") ? location.origin + location.pathname + "#socio" : "";
 }
+// Teléfono chileno → formato internacional para WhatsApp (56 9 XXXX XXXX). null si no es válido.
+function telWhatsApp(tel){
+  let d = String(tel || "").replace(/\D/g, "");
+  if(d.startsWith("00")) d = d.slice(2);
+  if(d.length === 8) d = "569" + d;
+  else if(d.length === 9 && d[0] === "9") d = "56" + d;
+  return /^569\d{8}$/.test(d) ? d : null;
+}
+function fmtTel(d){ return "+" + d.slice(0, 2) + " " + d.slice(2, 3) + " " + d.slice(3, 7) + " " + d.slice(7); }
+function correoValido(c){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(c || "").trim()); }
+function enviarCorreo(){
+  const url = enlacePortal();
+  if(!url){ toast("El enlace funciona cuando la app está publicada en internet (GitHub Pages).", true); return; }
+  const s = SOCIOS[editandoRut];
+  if(!s) return;
+  if(!correoValido(s.correo)){ toast("El alumno no tiene un correo válido en su ficha. Agrégalo y pulsa Guardar cambios.", true); return; }
+  if(!s.pin && !confirm("Este alumno no tiene clave del portal, así que no podrá entrar a ver la rutina. ¿Enviar el correo igual?")) return;
+  const r = s.rutina || {};
+  const lista = (r.sesiones || []).length;
+  const asunto = lista ? "Tu rutina del gimnasio UNAB" : "App del gimnasio UNAB";
+  const cuerpo = [
+    "Hola " + s.nombre.split(" ")[0] + ",",
+    "",
+    lista ? "Tu rutina del gimnasio está lista" + (r.vigenteDesde ? " (actualizada el " + r.vigenteDesde + ")" : "") + "." : "Ya puedes usar la app del gimnasio.",
+    "Para verla, abre este enlace desde tu celular:",
+    url,
+    "",
+    "Ingresa con tu RUT y la clave que te entregamos.",
+    "",
+    "Para tener la app en tu pantalla de inicio:",
+    "- Android: abre el enlace en Chrome y toca «Instalar».",
+    "- iPhone: abre el enlace en Safari, toca Compartir y luego «Agregar a inicio».",
+    "",
+    "Gimnasio UNAB"
+  ].join("\n");
+  location.href = "mailto:" + encodeURIComponent(s.correo.trim()) + "?subject=" + encodeURIComponent(asunto) + "&body=" + encodeURIComponent(cuerpo);
+  document.getElementById("btnEnviarCorreo").classList.replace("btn-primary", "btn-ghost");
+}
+function actualizarBotonWhatsApp(){
+  const btn = document.getElementById("btnCompartirPortal");
+  const s = editandoRut && SOCIOS[editandoRut];
+  const tel = s ? telWhatsApp(s.telefono) : null;
+  btn.textContent = "Enviar rutina por WhatsApp" + (tel ? " · " + fmtTel(tel) : "");
+  btn.title = tel ? "" : "El alumno no tiene un celular válido en su ficha";
+  const bc = document.getElementById("btnEnviarCorreo");
+  bc.textContent = "Enviar rutina por correo" + (s && correoValido(s.correo) ? " · " + s.correo.trim() : "");
+}
 function compartirPortal(){
   const url = enlacePortal();
   if(!url){ toast("El enlace funciona cuando la app está publicada en internet (GitHub Pages).", true); return; }
   const s = SOCIOS[editandoRut];
-  const texto = "Hola " + (s ? s.nombre.split(" ")[0] : "") + ", aquí puedes ver tu rutina del gimnasio desde el celular: " + url +
-    " — Ingresa con tu RUT y la clave que te entregamos.";
-  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  if(!s) return;
+  if(!s.pin && !confirm("Este alumno no tiene clave del portal, así que no podrá entrar a ver la rutina. ¿Enviar el mensaje igual?")) return;
+  const r = s.rutina || {};
+  const texto = "Hola " + s.nombre.split(" ")[0] + ", " +
+    ((r.sesiones || []).length ? "tu rutina del gimnasio está lista" + (r.vigenteDesde ? " (actualizada el " + r.vigenteDesde + ")" : "") : "ya puedes usar la app del gimnasio") +
+    ". Revísala en tu celular: " + url + " — Ingresa con tu RUT y la clave que te entregamos.";
+  const tel = telWhatsApp(s.telefono);
+  if(!tel && !confirm("El alumno no tiene un celular válido en su ficha (campo Teléfono). ¿Abrir WhatsApp para elegir el contacto a mano?")) return;
+  window.open("https://wa.me/" + (tel || "") + "?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  document.getElementById("btnCompartirPortal").classList.replace("btn-primary", "btn-ghost");
 }
 
 // ============================================================
@@ -1931,7 +1998,7 @@ const PLANTILLA_RECOMPOSICION = [
 ];
 
 function cargarPlantillaRecomposicion(){
-  if(rutinaEnEdicion.length && !confirm("Esto reemplaza la rutina actual del socio por la plantilla sugerida. ¿Continuar?")) return;
+  if(rutinaEnEdicion.length && !confirm("Esto reemplaza la rutina actual del alumno por la plantilla sugerida. ¿Continuar?")) return;
   rutinaEnEdicion = JSON.parse(JSON.stringify(PLANTILLA_RECOMPOSICION));
   renderRutinaEditor();
 }
@@ -2029,7 +2096,7 @@ function renderRutinaEditor(){
 }
 
 async function guardarRutina(){
-  if(!editandoRut){ toast("Selecciona un socio guardado primero.", true); return; }
+  if(!editandoRut){ toast("Selecciona un alumno guardado primero.", true); return; }
   const vacios = rutinaEnEdicion.reduce((n, ses) => n + ses.ejercicios.filter(ej => !ej.nombre).length, 0);
   if(vacios){ toast("Hay " + vacios + " fila(s) sin ejercicio elegido. Elige uno o elimina la fila.", true); return; }
   // Copia el video de técnica del catálogo para que el socio lo vea en el portal
@@ -2061,7 +2128,9 @@ async function guardarRutina(){
   }
   socio.rutina = nueva;
   if(await guardarSocios()){
-    toast("Rutina guardada y publicada en el celular del socio.");
+    toast("Rutina guardada. Envíasela al alumno por correo o WhatsApp.");
+    const socioG = SOCIOS[editandoRut];
+    document.getElementById(correoValido(socioG.correo) || !telWhatsApp(socioG.telefono) ? "btnEnviarCorreo" : "btnCompartirPortal").classList.replace("btn-ghost", "btn-primary");
     renderRutinaMeta(); renderRutinasAnteriores(); renderSocios();
   }
 }
@@ -2195,7 +2264,7 @@ function editarEvaluacion(evalId){
 }
 
 async function agregarEvaluacion(){
-  if(!editandoRut){ toast("Selecciona un socio guardado primero.", true); return; }
+  if(!editandoRut){ toast("Selecciona un alumno guardado primero.", true); return; }
   const fecha = document.getElementById("evalFecha").value.trim() || hoyStr();
   const peso = document.getElementById("evalPeso").value.trim();
   const cintura = document.getElementById("evalCintura").value.trim();
@@ -2331,7 +2400,33 @@ function tablaRegistros(regs){
 function renderRegistrosSocio(){
   const host = document.getElementById("tablaRegistrosWrap");
   if(!host) return;
-  host.innerHTML = editandoRut ? tablaRegistros(REGISTROS.filter(r => r.rut === editandoRut)) : "";
+  const regs = editandoRut ? REGISTROS.filter(r => r.rut === editandoRut) : [];
+  host.innerHTML = editandoRut ? tablaRegistros(regs) : "";
+  const prog = document.getElementById("tablaProgresoWrap");
+  if(prog) prog.innerHTML = editandoRut ? tablaProgreso(regs) : "";
+}
+// Por ejercicio: pesos registrados en orden cronológico, peso indicado hoy y variación
+function tablaProgreso(regs){
+  const porEj = {};
+  regs.slice().sort((a,b) => String(a.id).localeCompare(String(b.id))).forEach(r => (r.items || []).forEach(i => {
+    if(!i.hecho || !(numero(i.carga) > 0)) return;
+    (porEj[i.nombre] = porEj[i.nombre] || []).push({ fecha: r.fecha, kg: numero(i.carga) });
+  }));
+  const nombres = Object.keys(porEj);
+  if(!nombres.length) return '<div class="empty">Todavía no hay pesos registrados. El alumno los anota en su celular al terminar cada sesión.</div>';
+  const s = SOCIOS[editandoRut] || {};
+  const indicado = {};
+  ((s.rutina && s.rutina.sesiones) || []).forEach(ses => (ses.ejercicios || []).forEach(ej => { if(ej.kg) indicado[normNom(ej.nombre)] = ej.kg; }));
+  nombres.sort((a,b) => a.localeCompare(b, "es"));
+  let html = '<table><thead><tr><th>Ejercicio</th><th>Indicado</th><th>Registros (fecha · kg)</th><th>Variación</th></tr></thead><tbody>';
+  nombres.forEach(n => {
+    const l = porEj[n], ini = l[0].kg, fin = l[l.length - 1].kg, d = Math.round((fin - ini) * 10) / 10;
+    html += '<tr><td>' + escapeHtml(n) + '</td>' +
+      '<td style="white-space:nowrap">' + (indicado[normNom(n)] ? escapeHtml(indicado[normNom(n)]) + ' kg' : '<span class="muted-cell">—</span>') + '</td>' +
+      '<td><div class="resumen-items">' + (l.length > 10 ? '… ' : '') + l.slice(-10).map(x => escapeHtml(x.fecha.slice(0, 5)) + ' · <strong>' + fmtKg(x.kg) + '</strong>').join(' &nbsp;→&nbsp; ') + '</div></td>' +
+      '<td style="white-space:nowrap">' + (l.length > 1 ? '<strong style="color:' + (d > 0 ? 'var(--teal-d)' : d < 0 ? 'var(--red)' : 'var(--muted)') + '">' + (d > 0 ? '+' : '') + d.toLocaleString("es-CL") + ' kg</strong>' : '<span class="muted-cell">—</span>') + '</td></tr>';
+  });
+  return html + '</tbody></table>';
 }
 
 // ============================================================
@@ -2656,11 +2751,11 @@ function socioYaDentro(rutNorm){
 
 async function registrarEntrada(rutNorm){
   const socio = SOCIOS[rutNorm];
-  if(!socio){ toast("Este socio no está registrado.", true); return; }
+  if(!socio){ toast("Este alumno no está registrado.", true); return; }
 
   const casilleroYaOcupa = socioYaDentro(rutNorm);
   if(casilleroYaOcupa){
-    toast("Este socio ya está registrado en el casillero " + casilleroYaOcupa + ".", true);
+    toast("Este alumno ya está registrado en el casillero " + casilleroYaOcupa + ".", true);
     return;
   }
   const casillero = casilleroLibreDisponible();
@@ -2729,7 +2824,7 @@ function cambiarTab(tab){
 
 function renderSocios(){
   const ruts = Object.keys(SOCIOS);
-  document.getElementById("countSocios").textContent = ruts.length + " socio(s) registrado(s)";
+  document.getElementById("countSocios").textContent = ruts.length + " alumno(s) registrado(s)";
 
   const wrap = document.getElementById("tablaSociosWrap");
   const filtro = document.getElementById("filtroSocios").value.trim().toLowerCase();
@@ -2744,13 +2839,13 @@ function renderSocios(){
   }
 
   if(!filtrados.length){
-    wrap.innerHTML = '<div class="empty">' + (ruts.length ? "Sin resultados para esa búsqueda." : "Aún no hay socios registrados.") + '</div>';
+    wrap.innerHTML = '<div class="empty">' + (ruts.length ? "Sin resultados para esa búsqueda." : "Aún no hay alumnos registrados.") + '</div>';
     return;
   }
 
   filtrados.sort((a,b)=> SOCIOS[a].nombre.localeCompare(SOCIOS[b].nombre));
 
-  let html = '<table><thead><tr><th>RUT</th><th>Nombre</th><th>Teléfono</th><th>Teléfono de contacto</th><th>Dirección</th><th>Acceso</th><th></th></tr></thead><tbody>';
+  let html = '<table><thead><tr><th>RUT</th><th>Nombre</th><th>Teléfono</th><th>Teléfono de contacto</th><th>Correo</th><th>Acceso</th><th></th></tr></thead><tbody>';
   filtrados.forEach(r => {
     const s = SOCIOS[r];
     html += '<tr>' +
@@ -2758,7 +2853,7 @@ function renderSocios(){
       '<td>' + escapeHtml(s.nombre) + '' + '</td>' +
       '<td>' + (s.telefono ? escapeHtml(s.telefono) : '<span class="muted-cell">—</span>') + '</td>' +
       '<td>' + (s.telefonoContacto ? escapeHtml(s.telefonoContacto) : '<span class="muted-cell">—</span>') + '</td>' +
-      '<td>' + (s.direccion ? escapeHtml(s.direccion) : '<span class="muted-cell">—</span>') + '</td>' +
+      '<td>' + (s.correo ? escapeHtml(s.correo) : '<span class="muted-cell">—</span>') + '</td>' +
       '<td>' + (estadoAcceso(s).ok ? (s.pin ? '<span class="badge dentro">Activo</span>' : '<span class="badge fuera">Sin clave</span>') : '<span class="badge no" title="' + escapeAttr(estadoAcceso(s).motivo) + '">' + (s.habilitado === false ? 'Suspendido' : 'Vencido') + '</span>') + '</td>' +
       '<td style="white-space:nowrap">' +
         '<button class="btn btn-ghost btn-sm" data-editar="' + r + '">Editar</button> ' +
@@ -2805,10 +2900,10 @@ function renderKeyboard(){
 
 function renderDentro(){
   const activos = Object.keys(CASILLEROS).filter(k => CASILLEROS[k].ocupado);
-  document.getElementById("countDentro").textContent = activos.length + " socio(s) dentro";
+  document.getElementById("countDentro").textContent = activos.length + " alumno(s) dentro";
   const wrap = document.getElementById("tablaDentroWrap");
   if(!activos.length){
-    wrap.innerHTML = '<div class="empty">No hay socios en el gimnasio en este momento.</div>';
+    wrap.innerHTML = '<div class="empty">No hay alumnos en el gimnasio en este momento.</div>';
     return;
   }
   const visitaPorId = {};
@@ -2961,9 +3056,9 @@ async function importarSocios(file){
   if(!entrantes || typeof entrantes !== "object"){ toast("El archivo no trae la sección gym-socios.", true); return; }
 
   const ruts = Object.keys(entrantes).filter(r => rutValido(r) && entrantes[r] && entrantes[r].nombre);
-  if(!ruts.length){ toast("No se encontraron socios válidos en el archivo.", true); return; }
+  if(!ruts.length){ toast("No se encontraron alumnos válidos en el archivo.", true); return; }
   const existentes = ruts.filter(r => SOCIOS[normRut(r)]);
-  const msg = "Se importarán " + ruts.length + " socio(s)." +
+  const msg = "Se importarán " + ruts.length + " alumno(s)." +
     (existentes.length ? "\n" + existentes.length + " ya existe(n): se completarán con los datos del archivo. Las evaluaciones con la misma fecha se actualizan y las nuevas se agregan; la clave y la rutina se conservan si el archivo no las trae." : "") +
     "\n¿Continuar?";
   if(!confirm(msg)) return;
@@ -2972,7 +3067,7 @@ async function importarSocios(file){
   ruts.forEach(r => {
     const e = entrantes[r], n = normRut(r), prev = SOCIOS[n];
     if(prev){
-      ["nombre","telefono","telefonoContacto","direccion","objetivo","pin","vigenteHasta"].forEach(f => { if(lleno(e[f])) prev[f] = e[f]; });
+      ["nombre","telefono","telefonoContacto","correo","direccion","objetivo","pin","vigenteHasta"].forEach(f => { if(lleno(e[f])) prev[f] = e[f]; });
       if(typeof e.habilitado === "boolean") prev.habilitado = e.habilitado;
       if(e.antecedentes && typeof e.antecedentes === "object"){
         prev.antecedentes = prev.antecedentes || {};
@@ -3001,7 +3096,7 @@ async function importarSocios(file){
       return;
     }
     SOCIOS[n] = {
-      nombre: e.nombre, telefono: e.telefono || "", telefonoContacto: e.telefonoContacto || "",
+      nombre: e.nombre, telefono: e.telefono || "", telefonoContacto: e.telefonoContacto || "", correo: e.correo || "",
       direccion: e.direccion || "", objetivo: e.objetivo || "", pin: e.pin || "",
       habilitado: e.habilitado !== false, vigenteHasta: e.vigenteHasta || "",
       antecedentes: e.antecedentes || {}, controlRPE: !!e.controlRPE,
@@ -3023,7 +3118,7 @@ async function importarSocios(file){
   await guardarEjercicios();
   if(await guardarSocios()){
     for(const id of imgsViejas){ try{ await STORE.del("img:" + id); delete IMG_CACHE[id]; }catch(err){ console.error(err); } }
-    toast(ruts.length + " socio(s) importado(s).");
+    toast(ruts.length + " alumno(s) importado(s).");
     render();
     if(editandoRut && SOCIOS[editandoRut]) cargarSocioEnFormulario(editandoRut);
   }
@@ -3109,6 +3204,7 @@ async function init(){
   document.getElementById("btnAgregarSesion").addEventListener("click", agregarSesion);
   document.getElementById("btnGuardarRutina").addEventListener("click", guardarRutina);
   document.getElementById("btnCompartirPortal").addEventListener("click", compartirPortal);
+  document.getElementById("btnEnviarCorreo").addEventListener("click", enviarCorreo);
   document.getElementById("btnAgregarEvaluacion").addEventListener("click", agregarEvaluacion);
   document.getElementById("btnCancelarEval").addEventListener("click", cancelarEdicionEval);
   document.getElementById("btnAgregarFuerza").addEventListener("click", agregarFilaFuerza);
