@@ -230,7 +230,7 @@
   }
   .sesion-card .sesion-head{display:flex; gap:10px; align-items:center; margin-bottom:10px}
   .sesion-card .sesion-head input{font-family:'Fraunces',serif; font-size:14.5px; font-weight:600; background:#fff}
-  .ejercicio-row{display:grid; grid-template-columns:2.1fr 0.6fr 0.8fr 0.7fr 0.9fr 0.8fr 1.2fr auto; gap:6px; margin-bottom:6px; align-items:center}
+  .ejercicio-row{display:grid; grid-template-columns:2.2fr 0.6fr 0.8fr 0.8fr 0.8fr 1.4fr auto; gap:6px; margin-bottom:6px; align-items:center}
   @media (max-width:800px){ .ejercicio-row{grid-template-columns:1fr 1fr} .ejercicio-row select{grid-column:1/-1} .ejercicio-head-row{display:none} }
   .ejercicio-row input, .ejercicio-row select{padding:7px 9px; font-size:12.5px}
   .ejercicio-row select{background:#fff; font-family:'Public Sans',sans-serif}
@@ -239,7 +239,7 @@
     background:transparent; border:none; color:var(--faint); cursor:pointer; font-size:16px; padding:4px 8px;
   }
   .ejercicio-row .icon-btn:hover{color:var(--red)}
-  .ejercicio-head-row{display:grid; grid-template-columns:2.1fr 0.6fr 0.8fr 0.7fr 0.9fr 0.8fr 1.2fr auto; gap:6px; margin-bottom:6px;}
+  .ejercicio-head-row{display:grid; grid-template-columns:2.2fr 0.6fr 0.8fr 0.8fr 0.8fr 1.4fr auto; gap:6px; margin-bottom:6px;}
   @media (max-width:800px){ .ejercicio-head-row{display:none} }
   .ejercicio-head-row span{font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--faint); font-weight:700}
   .sesion-actions{display:flex; justify-content:space-between; margin-top:8px}
@@ -604,7 +604,8 @@
           <input type="text" id="socVigente" placeholder="dd-mm-aaaa" autocomplete="off">
         </div>
       </div>
-      <details class="antecedentes" id="bloqueAntecedentes">
+      <!-- Anamnesis EN ESPERA: oculta mientras MOSTRAR_ANAMNESIS = false. Los datos ya guardados se conservan. -->
+      <details class="antecedentes" id="bloqueAntecedentes" hidden>
         <summary>Antecedentes de salud <span class="solo-staff">solo personal · no se muestra en el portal</span><span id="antResumen"></span></summary>
         <div class="form-grid" id="antGrid"></div>
         <label style="margin-top:10px">PAR-Q</label>
@@ -623,9 +624,9 @@
       <div class="ficha-avanzada" id="fichaAvanzada">
 
         <h3>Rutina de entrenamiento</h3>
-        <div class="desc">Es lo que el socio ve en su celular. Actualízala después de cada evaluación.</div>
+        <div class="desc">Es lo que el socio ve en su celular. Elige los ejercicios y, cuando corresponda, el peso en kg.</div>
         <div id="rutinaMeta"></div>
-        <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-grid" style="margin-bottom:14px; display:none">
           <div class="field"><label for="rutBaseEval">Basada en la evaluación del</label><select id="rutBaseEval"></select></div>
           <div class="field"><label for="rutProxEval">Próxima evaluación</label><input type="text" id="rutProxEval" placeholder="dd-mm-aaaa" autocomplete="off"></div>
         </div>
@@ -670,7 +671,7 @@
           </div>
           <div class="fuerza-box">
             <div class="t">Test de fuerza</div>
-            <div class="d">Por cada ejercicio: la carga levantada y cuántas repeticiones completó con técnica correcta. La app estima el 1RM y con él calcula los kilos de la rutina.</div>
+            <div class="d">Por cada ejercicio: la carga levantada y cuántas repeticiones completó con técnica correcta. La app estima el 1RM como referencia para el profesor.</div>
             <div id="fuerzaEditor"></div>
             <button class="btn btn-ghost btn-sm" id="btnAgregarFuerza" type="button">+ Ejercicio al test</button>
           </div>
@@ -852,6 +853,8 @@ const SUPABASE_URL = "https://cqvlenhilzpqtjdzmpip.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdmxlbmhpbHpwcXRqZHptcGlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2ODU4NzEsImV4cCI6MjEwODI2MTg3MX0.88vQ2dELQafAGXSUvtEbG_0c-IHAwrMHjXrIeHySFz8";
 // App del socio (repo «mi-rutina»). Vacío = usar la vista #socio de esta misma página.
 const APP_SOCIO_URL = "https://jorgesabattin.github.io/mi-rutina/?g=unab";
+// Anamnesis (antecedentes de salud, PAR-Q, RPE): en espera. Cambiar a true para volver a mostrarla.
+const MOSTRAR_ANAMNESIS = false;
 const MODO_NUBE = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const sb = MODO_NUBE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -1364,8 +1367,8 @@ async function guardarFichaSocio(){
   const existente = SOCIOS[norm] || {};
   SOCIOS[norm] = Object.assign({}, existente, {
     nombre, telefono, telefonoContacto, direccion, objetivo, pin, habilitado, vigenteHasta,
-    antecedentes: leerAntecedentes(),
-    controlRPE: document.getElementById("socControlRPE").checked,
+    antecedentes: MOSTRAR_ANAMNESIS ? leerAntecedentes() : (existente.antecedentes || {}),
+    controlRPE: MOSTRAR_ANAMNESIS ? document.getElementById("socControlRPE").checked : !!existente.controlRPE,
     rutina: existente.rutina || null,
     evaluaciones: existente.evaluaciones || []
   });
@@ -1391,7 +1394,7 @@ function cargarSocioEnFormulario(rutNorm){
   escribirAntecedentes(s.antecedentes);
   document.getElementById("socControlRPE").checked = !!s.controlRPE;
   renderResumenAntecedentes(s);
-  document.getElementById("bloqueAntecedentes").open = tieneAlertaSalud(s);
+  document.getElementById("bloqueAntecedentes").open = MOSTRAR_ANAMNESIS && tieneAlertaSalud(s);
   document.getElementById("editNoteTxt").textContent = "Editando la ficha de " + (s.nombre || formatRut(rutNorm)) + ".";
   document.getElementById("editNote").classList.add("show");
   document.getElementById("btnGuardarSocio").textContent = "Guardar cambios";
@@ -1784,30 +1787,12 @@ function rutinaDesactualizada(s){
   return fechaNum(ult.fecha) > base;
 }
 function renderRutinaMeta(){
-  const sel = document.getElementById("rutBaseEval");
   const banner = document.getElementById("rutinaMeta");
-  const prox = document.getElementById("rutProxEval");
-  if(!editandoRut || !SOCIOS[editandoRut]){ sel.innerHTML = ""; banner.innerHTML = ""; prox.value = ""; return; }
-  const s = SOCIOS[editandoRut];
-  const r = s.rutina || {};
-  const evals = (s.evaluaciones || []).slice().sort((a,b) => fechaNum(b.fecha) - fechaNum(a.fecha));
-  const elegido = sel.dataset.forzar || r.evaluacionId || (evals[0] ? evals[0].id : "");
-  delete sel.dataset.forzar;
-  sel.innerHTML = '<option value="">Sin evaluación asociada</option>' + evals.map(ev =>
-    '<option value="' + ev.id + '"' + (ev.id === elegido ? ' selected' : '') + '>' + escapeHtml(ev.fecha) + (ev.peso ? ' · ' + escapeHtml(ev.peso) + ' kg' : '') + '</option>'
-  ).join("");
-  prox.value = r.proximaEvaluacion || "";
-  const ult = evals[0];
-  if(!(r.sesiones || []).length){
-    banner.innerHTML = '<div class="rut-banner">El socio aún no tiene rutina publicada.' + (ult ? ' Arma la rutina a partir de la evaluación del ' + escapeHtml(ult.fecha) + ' y guárdala.' : '') + '</div>';
-  } else if(rutinaDesactualizada(s)){
-    banner.innerHTML = '<div class="rut-banner alerta"><strong>Rutina pendiente de actualizar.</strong> Hay una evaluación del ' + escapeHtml(ult.fecha) +
-      ' más reciente que la rutina vigente' + (r.evaluacionFecha ? ' (basada en la del ' + escapeHtml(r.evaluacionFecha) + ')' : '') +
-      '. Ajusta los ejercicios y pulsa <em>Guardar rutina</em>: el socio verá la nueva versión en su celular.</div>';
-  } else {
-    banner.innerHTML = '<div class="rut-banner ok">Publicada en el celular del socio' + (r.vigenteDesde ? ' desde el ' + escapeHtml(r.vigenteDesde) : '') +
-      (r.evaluacionFecha ? ', basada en la evaluación del ' + escapeHtml(r.evaluacionFecha) : '') + '.</div>';
-  }
+  if(!editandoRut || !SOCIOS[editandoRut]){ banner.innerHTML = ""; return; }
+  const r = SOCIOS[editandoRut].rutina || {};
+  banner.innerHTML = (r.sesiones || []).length
+    ? '<div class="rut-banner ok">Publicada en el celular del socio' + (r.vigenteDesde ? ' desde el ' + escapeHtml(r.vigenteDesde) : '') + '.</div>'
+    : '<div class="rut-banner">El socio aún no tiene rutina publicada.</div>';
 }
 function renderRutinasAnteriores(){
   const host = document.getElementById("rutinasAnteriores");
@@ -1815,9 +1800,8 @@ function renderRutinasAnteriores(){
   const lista = s && s.rutinasAnteriores || [];
   if(!lista.length){ host.innerHTML = ""; return; }
   host.innerHTML = '<details class="rut-historial"><summary>Versiones anteriores de la rutina (' + lista.length + ')</summary>' +
-    '<table><thead><tr><th>Vigente</th><th>Evaluación base</th><th>Sesiones</th><th></th></tr></thead><tbody>' +
+    '<table><thead><tr><th>Vigente</th><th>Sesiones</th><th></th></tr></thead><tbody>' +
     lista.map((r, i) => '<tr><td style="white-space:nowrap">' + escapeHtml(r.vigenteDesde || "—") + ' → ' + escapeHtml(r.hasta || "—") + '</td>' +
-      '<td>' + escapeHtml(r.evaluacionFecha || "—") + '</td>' +
       '<td>' + (r.sesiones || []).map(x => escapeHtml(x.nombre)).join("<br>") + '</td>' +
       '<td><button class="btn btn-ghost btn-sm" data-cargar-version="' + i + '">Copiar al editor</button></td></tr>').join("") +
     '</tbody></table></details>';
@@ -1984,14 +1968,13 @@ function renderRutinaEditor(){
         '<input type="text" data-sesion-nombre="' + sIdx + '" value="' + escapeAttr(sesion.nombre) + '">' +
         '<button class="btn btn-danger btn-sm" data-eliminar-sesion="' + sIdx + '">Eliminar sesión</button>' +
       '</div>' +
-      '<div class="ejercicio-head-row"><span>Ejercicio</span><span>Series</span><span>Reps</span><span>% 1RM</span><span>Carga</span><span>Descanso</span><span>Notas</span><span></span></div>';
+      '<div class="ejercicio-head-row"><span>Ejercicio</span><span>Series</span><span>Reps</span><span>Peso (kg)</span><span>Descanso</span><span>Notas</span><span></span></div>';
     sesion.ejercicios.forEach((ej, eIdx)=>{
       html += '<div class="ejercicio-row">' +
         '<select data-ej-sel data-s="' + sIdx + '" data-e="' + eIdx + '" class="' + (ej.nombre ? '' : 'vacio') + '" aria-label="Ejercicio">' + opcionesEjercicios(ej.nombre) + '</select>' +
         '<input type="text" placeholder="Series" data-ej="series" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.series) + '">' +
         '<input type="text" placeholder="Reps" data-ej="reps" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.reps) + '">' +
-        '<input type="text" inputmode="decimal" placeholder="auto" title="% del 1RM. Vacío = según las reps, con ' + RIR_DEFECTO + ' en reserva" data-ej="pct" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.pct || "") + '">' +
-        (c => '<div class="kg-calc' + (c ? '' : ' sin') + '" data-kg="' + sIdx + ':' + eIdx + '" title="' + escapeAttr(tituloCarga(c)) + '">' + textoCarga(c) + '</div>')(calcularCarga(SOCIOS[editandoRut], ej, evalBaseSeleccionada())) +
+        '<input type="text" inputmode="decimal" placeholder="kg" title="Peso en kg. Vacío si es peso corporal o por tiempo" data-ej="kg" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.kg || "") + '">' +
         '<input type="text" placeholder="Descanso" data-ej="descanso" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.descanso) + '">' +
         '<input type="text" placeholder="Notas" data-ej="notas" data-s="' + sIdx + '" data-e="' + eIdx + '" value="' + escapeAttr(ej.notas) + '">' +
         '<button class="icon-btn" data-eliminar-ejercicio="' + sIdx + ':' + eIdx + '" title="Eliminar ejercicio">✕</button>' +
@@ -2029,11 +2012,6 @@ function renderRutinaEditor(){
     inp.oninput = () => {
       const s = +inp.getAttribute("data-s"), e = +inp.getAttribute("data-e"), campo = inp.getAttribute("data-ej");
       rutinaEnEdicion[s].ejercicios[e][campo] = inp.value;
-      if(campo === "pct" || campo === "reps"){
-        const cell = host.querySelector('[data-kg="' + s + ':' + e + '"]');
-        const c = calcularCarga(SOCIOS[editandoRut], rutinaEnEdicion[s].ejercicios[e], evalBaseSeleccionada());
-        if(cell){ cell.textContent = textoCarga(c); cell.title = tituloCarga(c); cell.classList.toggle("sin", !c); }
-      }
     };
   });
   host.querySelectorAll("button[data-eliminar-sesion]").forEach(btn=>{
@@ -2061,30 +2039,25 @@ async function guardarRutina(){
     ej.tecnica = cat && cat.descripcion ? cat.descripcion : "";
   }));
   const socio = SOCIOS[editandoRut];
-  const evId = document.getElementById("rutBaseEval").value;
-  const ev = (socio.evaluaciones || []).find(x => x.id === evId);
-  const prox = document.getElementById("rutProxEval").value.trim();
-  const pctMalo = rutinaEnEdicion.some(ses => ses.ejercicios.some(ej => String(ej.pct || "").trim() && !(numero(ej.pct) > 0 && numero(ej.pct) <= 100)));
-  if(pctMalo){ toast("El % 1RM debe ser un número entre 1 y 100 (o quedar vacío).", true); return; }
+  const kgMalo = rutinaEnEdicion.some(ses => ses.ejercicios.some(ej => String(ej.kg || "").trim() && !(numero(ej.kg) > 0 && numero(ej.kg) <= 500)));
+  if(kgMalo){ toast("El peso debe ser un número en kg (por ejemplo 12,5) o quedar vacío.", true); return; }
   rutinaEnEdicion.forEach(ses => ses.ejercicios.forEach(ej => {
-    const c = calcularCarga(socio, ej, evId);
-    ej.kg = c ? fmtKg(c.kg) : "";
+    ej.kg = String(ej.kg || "").trim() ? fmtKg(numero(ej.kg)) : "";
+    delete ej.pct;
   }));
-  if(prox && !fechaNum(prox)){ toast("La próxima evaluación debe tener formato dd-mm-aaaa.", true); return; }
   const anterior = socio.rutina;
   const nueva = {
     sesiones: JSON.parse(JSON.stringify(rutinaEnEdicion)),
     vigenteDesde: hoyStr(),
-    evaluacionId: ev ? ev.id : "",
-    evaluacionFecha: ev ? ev.fecha : "",
-    proximaEvaluacion: prox
+    evaluacionId: "",
+    evaluacionFecha: "",
+    proximaEvaluacion: anterior ? anterior.proximaEvaluacion || "" : ""
   };
   const cambioEjercicios = !anterior || JSON.stringify(anterior.sesiones || []) !== JSON.stringify(nueva.sesiones);
-  const cambioBase = !anterior || (anterior.evaluacionId || "") !== nueva.evaluacionId;
-  if(anterior && (anterior.sesiones || []).length && (cambioEjercicios || cambioBase)){
+  if(anterior && (anterior.sesiones || []).length && cambioEjercicios){
     socio.rutinasAnteriores = [Object.assign({}, anterior, { hasta: hoyStr() })].concat(socio.rutinasAnteriores || []).slice(0, 20);
-  } else if(anterior && !cambioEjercicios && !cambioBase){
-    nueva.vigenteDesde = anterior.vigenteDesde || nueva.vigenteDesde;   // solo cambió la próxima evaluación
+  } else if(anterior && !cambioEjercicios){
+    nueva.vigenteDesde = anterior.vigenteDesde || nueva.vigenteDesde;   // sin cambios: se mantiene la fecha
   }
   socio.rutina = nueva;
   if(await guardarSocios()){
@@ -2253,7 +2226,7 @@ async function agregarEvaluacion(){
     const esBase = socio.rutina && socio.rutina.evaluacionId === editando.id;
     cancelarEdicionEval();
     renderEvaluaciones(); renderRutinaMeta(); renderRutinaEditor(); renderSocios();
-    toast(esBase ? "Evaluación actualizada. Pulsa Guardar rutina para publicar las cargas nuevas." : "Evaluación actualizada.");
+    toast("Evaluación actualizada.");
     return;
   }
   socio.evaluaciones.push(Object.assign({ id:"e"+Date.now(), fecha, peso, cintura, notas, imagenId, fuerza }, extra));
@@ -2262,16 +2235,7 @@ async function agregarEvaluacion(){
 
   cancelarEdicionEval();
   renderEvaluaciones();
-  const nuevaEv = socio.evaluaciones[socio.evaluaciones.length - 1];
-  const sel = document.getElementById("rutBaseEval");
-  sel.dataset.forzar = nuevaEv.id;
-  renderRutinaMeta();
-  renderRutinaEditor();
   renderSocios();
-  if(confirm("Evaluación registrada. ¿Actualizar ahora la rutina del socio a partir de esta evaluación?")){
-    document.getElementById("rutinaMeta").scrollIntoView({ behavior:"smooth", block:"start" });
-    toast("Ajusta los ejercicios y pulsa Guardar rutina para publicarla.");
-  }
 }
 
 async function eliminarEvaluacion(evalId){
@@ -2791,7 +2755,7 @@ function renderSocios(){
     const s = SOCIOS[r];
     html += '<tr>' +
       '<td class="rut-mono">' + formatRut(r) + '</td>' +
-      '<td>' + escapeHtml(s.nombre) + (rutinaDesactualizada(s) ? '<span class="badge-pend" title="Hay una evaluación más reciente que la rutina">Actualizar rutina</span>' : '') + '</td>' +
+      '<td>' + escapeHtml(s.nombre) + '' + '</td>' +
       '<td>' + (s.telefono ? escapeHtml(s.telefono) : '<span class="muted-cell">—</span>') + '</td>' +
       '<td>' + (s.telefonoContacto ? escapeHtml(s.telefonoContacto) : '<span class="muted-cell">—</span>') + '</td>' +
       '<td>' + (s.direccion ? escapeHtml(s.direccion) : '<span class="muted-cell">—</span>') + '</td>' +
@@ -2855,7 +2819,7 @@ function renderDentro(){
     const v = visitaPorId[est.visitaId];
     html += '<tr>' +
       '<td class="rut-mono">' + formatRut(est.rut) + '</td>' +
-      '<td>' + escapeHtml(est.nombre) + (SOCIOS[est.rut] && SOCIOS[est.rut].controlRPE ? '<span class="alerta-salud" title="Controlar intensidad por RPE">RPE</span>' : '') + '</td>' +
+      '<td>' + escapeHtml(est.nombre) + (MOSTRAR_ANAMNESIS && SOCIOS[est.rut] && SOCIOS[est.rut].controlRPE ? '<span class="alerta-salud" title="Controlar intensidad por RPE">RPE</span>' : '') + '</td>' +
       '<td>' + k + '</td>' +
       '<td>' + (v ? v.horaEntrada : "—") + '</td>' +
       '<td><button class="btn btn-danger btn-sm" data-casillero="' + k + '">Registrar salida</button></td>' +
@@ -3122,6 +3086,7 @@ async function init(){
   document.getElementById("filtroSocios").addEventListener("input", renderSocios);
   document.getElementById("btnRespaldo").addEventListener("click", descargarRespaldo);
   construirAntecedentes();
+  document.getElementById("bloqueAntecedentes").hidden = !MOSTRAR_ANAMNESIS;
   construirCamposEval();
   document.getElementById("visorCerrar").addEventListener("click", cerrarVisor);
   document.getElementById("visor").addEventListener("click", e => { if(e.target.id === "visor") cerrarVisor(); });
