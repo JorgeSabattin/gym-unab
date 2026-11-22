@@ -3,17 +3,19 @@ name: Supabase keep-alive (GYM UNAB)
 on:
   schedule:
     - cron: "17 12 */3 * *"   # cada 3 días, 09:17 hora Chile aprox.
-  workflow_dispatch:           # permite ejecutarlo a mano
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
+    env:
+      SB_URL: https://cqvlenhilzpqtjdzmpip.supabase.co
+      SB_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdmxlbmhpbHpwcXRqZHptcGlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2ODU4NzEsImV4cCI6MjEwODI2MTg3MX0.88vQ2dELQafAGXSUvtEbG_0c-IHAwrMHjXrIeHySFz8
     steps:
       - name: Consultar la base
         run: |
-          curl -sS -f -X POST \
-            "https://cqvlenhilzpqtjdzmpip.supabase.co/rest/v1/rpc/socio_portal" \
-            -H "apikey: ${{ secrets.SUPABASE_UNAB_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_UNAB_ANON_KEY }}" \
+          curl -sS -f -X POST "$SB_URL/rest/v1/rpc/socio_portal" \
+            -H "apikey: $SB_KEY" \
+            -H "Authorization: Bearer $SB_KEY" \
             -H "Content-Type: application/json" \
             -d '{"p_rut":"keepalive","p_pin":"0"}'
